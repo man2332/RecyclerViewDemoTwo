@@ -32,6 +32,14 @@
             android:layout_centerVertical="true"
             />
         <ImageView
+            android:id="@+id/playTimerView"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_touch_app"
+            android:layout_alignParentTop="true"
+            android:layout_toLeftOf="@id/editView"
+            />
+        <ImageView
             android:id="@+id/editView"
             android:layout_width="50dp"
             android:layout_height="50dp"
