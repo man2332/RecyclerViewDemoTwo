@@ -1,21 +1,21 @@
 package com.example.man2332.recyclerviewdemotwo;
 
-public class Item {
-    private String topic;
+public class Topic {
+    private String topicName;
     private String totalTime;
 
 
-    public Item(String topic, String totalTime) {
-        this.topic = topic;
+    public Topic(String topic, String totalTime) {
+        this.topicName = topic;
         this.totalTime = totalTime;
     }
 
     public String getTopic() {
-        return topic;
+        return topicName;
     }
 
     public void setTopic(String topic) {
-        this.topic = topic;
+        this.topicName = topic;
     }
 
     public String getTotalTime() {

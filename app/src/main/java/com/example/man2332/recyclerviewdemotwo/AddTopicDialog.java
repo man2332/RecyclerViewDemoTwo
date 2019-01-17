@@ -52,7 +52,7 @@ public class AddTopicDialog extends AppCompatDialogFragment {
                     "must implement AddTopicDialogListener");
         }
     }
-    //MainActivity implements & calls this to create a new topic
+    //MainActivity implements & calls this to create a new topicName
     public interface AddTopicDialogListener{
         void addTopic(String name);
     }
