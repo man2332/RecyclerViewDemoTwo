@@ -38,8 +38,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     //interface that will be required to be implemented when used
     public interface OnItemClickListener{
         //when user clicks on card item itself- or clicks on the edit icon
-        void onItemClick(int position);
-        //void onEditClick(int position);
+        void onItemClick(int id);
+        void onEditClick(int id);
         //this interface tells us that when mlistener is being set(setOnItemClickListener),
         // the object that is passed(OnItemClickListener listener), must implement both onItemClick & onEditClick
     }
@@ -87,12 +87,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                     mlistener.onItemClick(id);
                 }
             });
-
+            //TODO: remove this later, the delete functionality will be placed in Pomodoro activity instead
             //-when user clicks on the edit icon
             editView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    int id = parseInt(itemView.getTag().toString());
+                    mlistener.onEditClick(id);
                 }
             });
 

@@ -76,6 +76,8 @@ public class TimerService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
 
+        //TODO: the notification should show the countdown time on the notification
+        //TODO: clicking the notification should bring up the promodoro timer activity
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Example Service")
                 .setContentText("Timer Is running#@@")

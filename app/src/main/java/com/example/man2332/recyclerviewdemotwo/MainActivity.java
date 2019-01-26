@@ -2,7 +2,9 @@ package com.example.man2332.recyclerviewdemotwo;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
@@ -14,7 +16,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.Toast;
+//TODO: create a Main menu - 3 buttons - Pomodoro, Goals/calender, Journal/productively logs
+// maybe add a alarm- where u set reminders - when to start a certain thing like...
+//  at 5pm everyday start studying java, or wake up 7am
+
+//TODO: GOAL Streaks functionality-set a timed goal everyday, like study for 4 hours each day and track
+// when you hit your daily goal or not
+//TODO: Productively Tracker-App asks every hour what you did, to keep track of a journal of what you did each day
+// it could be every 2-3 hours or so, whatever user sets it to be, and can turn this on/off
 
 public class MainActivity extends AppCompatActivity implements AddTopicDialog.AddTopicDialogListener {
     private static final String TAG = "MTag";//, MyAdapter.OnItemClickListener
@@ -27,13 +39,22 @@ public class MainActivity extends AppCompatActivity implements AddTopicDialog.Ad
     //for using a database
     private SQLiteDatabase db;
     private Cursor mCursor;
+    TopicDBHelper topicDBHelper;
+
+
+    private TextView goalText;
+    private int goalTimeMins = 60;
+    private int goalTimeMinsCompleted;
+    private int goalTimeSecondsCompleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: MAIN");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        goalText = findViewById(R.id.goal_text_view);
+        goalText.setText("Total completed: "+goalTimeSecondsCompleted);
         //createItemList();
         setUpRecyclerView();
     }
@@ -49,9 +70,19 @@ public class MainActivity extends AppCompatActivity implements AddTopicDialog.Ad
         startActivityForResult(intent, 1, bundle);
     }
 
+    private void deletePomodoro(int id) {
+        //TODO: prompt the user "Are you sure you want to delete?"
+        Log.d(TAG, "deletePomodoro: MAIN: "+id);
+        db = topicDBHelper.getWritableDatabase();
+        db.delete(TopicContract.TopicEntry.TABLE_NAME,
+                TopicContract.TopicEntry._ID+"="+id,
+                null);
+        mAdapter.swapCursor(getAllTopics());
+    }
+
     private void setUpRecyclerView() {
         //create a db
-        TopicDBHelper topicDBHelper = new TopicDBHelper(this);
+        topicDBHelper = new TopicDBHelper(this);
         db = topicDBHelper.getWritableDatabase();
         mCursor = getAllTopics();
 
@@ -71,6 +102,11 @@ public class MainActivity extends AppCompatActivity implements AddTopicDialog.Ad
                 startPomodoro(id);
             }
 
+            @Override
+            public void onEditClick(int id) {
+                deletePomodoro(id);
+            }
+
 //            @Override
 //            public void onEditClick(int position) {
 //
@@ -88,6 +124,9 @@ public class MainActivity extends AppCompatActivity implements AddTopicDialog.Ad
 
 
     }
+
+
+
     //***************************Database stuff*****************************************************
     //-return all topics in the database
     private Cursor getAllTopics() {
@@ -126,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements AddTopicDialog.Ad
     }
     @Override
     public void addTopic(String name) {
+        Log.d(TAG, "addTopic: MAIN: "+name);
         //add a new topic to the db
         if(name.trim().length() != 0){
             ContentValues contentValues = new ContentValues();
@@ -177,12 +217,33 @@ public class MainActivity extends AppCompatActivity implements AddTopicDialog.Ad
         if(requestCode == 1){
             Log.d(TAG, "onActivityResult: 1");
             if(resultCode == Activity.RESULT_OK){
-                Log.d(TAG, "onActivityResult: 3");
-                String timeLeft = data.getData().toString();
-                Toast.makeText(getApplicationContext(),timeLeft,Toast.LENGTH_LONG).show();
+                Log.d(TAG, "onActivityResult: 3 : "+data.getIntExtra("goalTimeSecondsCompleted",0));
+                //String timeLeft = data.getData().toString();
+                //Toast.makeText(getApplicationContext(),timeLeft,Toast.LENGTH_LONG).show();
+                goalTimeSecondsCompleted += data.getIntExtra("goalTimeSecondsCompleted",0);
             }
         }
         Log.d(TAG, "onActivityResult: 2");
+        goalText.setText("Total completed: "+goalTimeSecondsCompleted);
+    }
+    //saving the shared prefs & data
+    @Override
+    protected void onStart() {
+        super.onStart();
 
+        SharedPreferences sharedPreferences = getSharedPreferences("MainPrefs",MODE_PRIVATE);
+
+        goalTimeSecondsCompleted = sharedPreferences.getInt("goalTimeSecondsCompleted", 2);
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("MainPrefs", MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("goalTimeSecondsCompleted", goalTimeSecondsCompleted);
     }
 }
